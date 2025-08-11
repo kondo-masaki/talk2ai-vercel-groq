@@ -2,6 +2,16 @@
 
 Voice-enabled conversational web application powered by Vercel AI SDK and Groq Cloud API.
 
+## 🎮 Live Demo
+
+**Try it now:** https://talk2ai-vercel-groq-pr05tf5tq-kondo-masakis-projects.vercel.app/
+
+This is a sample application running on Groq's free tier API. Please note:
+- 🆓 Using Groq Cloud free tier (rate limits apply)
+- 📖 Open source under MIT License
+- 🔄 May experience slower response times during peak usage
+- ⚠️ Free tier limits: ~30 requests/minute, 14,400 requests/day
+
 ## Features
 
 - 🎤 Voice Input (Web Speech API / Groq Whisper)
@@ -224,7 +234,11 @@ Pull requests are welcome. For major changes, please open an issue first.
 
 ## License
 
-MIT
+MIT - This is free and open source software. You can use, modify, and distribute it under the terms of the MIT License.
+
+## Demo Application
+
+The live demo at https://talk2ai-vercel-groq-pr05tf5tq-kondo-masakis-projects.vercel.app/ is provided as a sample implementation using Groq's free tier API. Feel free to fork this repository and deploy your own instance with your own API key for unrestricted usage.
 
 ## Links
 
