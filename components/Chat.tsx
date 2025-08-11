@@ -53,7 +53,8 @@ const DEFAULT_SETTINGS = {
   llmModel: 'llama-3.3-70b-versatile',
   speechRecognition: 'web-speech-api',
   temperature: 0.7,
-  language: typeof window !== 'undefined' ? getBrowserLanguage() : 'en-US'
+  language: typeof window !== 'undefined' ? getBrowserLanguage() : 'en-US',
+  enableWebSearch: false
 }
 
 export default function Chat() {
@@ -146,7 +147,8 @@ export default function Chat() {
             content: m.content
           })),
           model: settings.llmModel,
-          temperature: settings.temperature
+          temperature: settings.temperature,
+          enableWebSearch: settings.enableWebSearch
         }),
       })
       

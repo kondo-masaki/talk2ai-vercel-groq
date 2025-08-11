@@ -10,6 +10,7 @@ interface SettingsProps {
     llmModel: string
     speechRecognition: string
     temperature: number
+    enableWebSearch?: boolean
   }
   onSettingsChange: (settings: any) => void
 }
@@ -75,6 +76,25 @@ export default function Settings({ isOpen, onClose, settings, onSettingsChange }
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Web Search Toggle */}
+        <div className="mb-4">
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              checked={localSettings.enableWebSearch || false}
+              onChange={(e) => setLocalSettings({ ...localSettings, enableWebSearch: e.target.checked })}
+              className="mr-2"
+            />
+            <span className="text-sm font-medium">
+              Enable Web Search (for current information)
+            </span>
+          </label>
+          <p className="text-xs text-gray-500 mt-1">
+            Allows AI to search the web for up-to-date information.
+            {!process.env.NEXT_PUBLIC_HAS_TAVILY && ' (Requires Tavily API key)'}
+          </p>
         </div>
 
         {/* Temperature Setting */}
