@@ -10,7 +10,7 @@ This is a sample application running on Groq's free tier API. Please note:
 - 🆓 Using Groq Cloud free tier (rate limits apply)
 - 📖 Open source under MIT License
 - 🔄 May experience slower response times during peak usage
-- ⚠️ Free tier limits: ~30 requests/minute, 14,400 requests/day
+- ⚠️ Free tier has rate limits - check [Groq's rate limits page](https://console.groq.com/settings/limits) for current limits
 
 ## Features
 
