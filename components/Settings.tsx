@@ -93,7 +93,9 @@ export default function Settings({ isOpen, onClose, settings, onSettingsChange }
           </label>
           <p className="text-xs text-gray-500 mt-1">
             Allows AI to search the web for up-to-date information.
-            {!process.env.NEXT_PUBLIC_HAS_TAVILY && ' (Requires Tavily API key)'}
+            {localSettings.llmModel?.includes('gpt-oss') ? 
+              ' (Available with GPT OSS models)' : 
+              ' (Requires GPT OSS 20B or 120B model)'}
           </p>
         </div>
 

@@ -3,6 +3,7 @@
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition'
 import { useGroqWhisper } from '@/hooks/useGroqWhisper'
 import { useEffect, useRef, useState } from 'react'
+// import { useChat } from 'ai'
 import Settings from './Settings'
 
 interface Message {
@@ -156,6 +157,7 @@ export default function Chat() {
         throw new Error('API request failed')
       }
       
+      // Handle UI Message stream response
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
       let assistantMessage = ''
@@ -167,7 +169,58 @@ export default function Chat() {
           if (done) break
           
           const chunk = decoder.decode(value)
-          assistantMessage += chunk
+          
+          // Parse UI Message stream format (Server-Sent Events)
+          const lines = chunk.split('\n').filter(line => line.trim())
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              // Server-sent event format
+              const data = line.substring(6)
+              try {
+                const parsed = JSON.parse(data)
+                
+                // Handle different message types in UI stream
+                switch (parsed.type) {
+                  case 'text-delta':
+                    // Standard text content
+                    assistantMessage += parsed.delta || ''
+                    break
+                  case 'reasoning-delta':
+                    // Reasoning content (for GPT OSS models) - Skip displaying to user
+                    // This is internal reasoning/thinking process, not the actual response
+                    break
+                  case 'text':
+                    // Complete text content
+                    assistantMessage += parsed.content || ''
+                    break
+                  case 'tool-call-delta':
+                    // Tool call content
+                    if (parsed.delta) {
+                      assistantMessage += parsed.delta
+                    }
+                    break
+                  case 'tool-result':
+                    // Tool result content
+                    if (parsed.result) {
+                      assistantMessage += `\n\n[Search results: ${JSON.stringify(parsed.result)}]\n\n`
+                    }
+                    break
+                  default:
+                    // Ignore other types (start, finish, etc.)
+                    break
+                }
+              } catch {
+                // Fallback: treat as plain text
+                if (!data.startsWith('{')) {
+                  assistantMessage += data
+                }
+              }
+            } else if (!line.startsWith('data:') && line.trim() && line !== '[DONE]') {
+              // Plain text fallback for any remaining content (skip [DONE] marker)
+              assistantMessage += line
+            }
+          }
           
           setMessages(prev => {
             const newMessages = [...prev]

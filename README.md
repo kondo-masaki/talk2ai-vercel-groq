@@ -23,12 +23,13 @@ This is a sample application running on Groq's free tier API. Please note:
 - 📊 Real-time Transcription Progress Indicator
 - 💾 Persistent Settings (localStorage)
 - 🌐 Auto-detect Browser Language
+- 🔍 Built-in Web Search (GPT OSS models only)
 
 ## Available Models
 
 ### LLM Models (10 Options)
-1. **GPT OSS 20B** - OpenAI-compatible with browser search & code execution
-2. **GPT OSS 120B** - Flagship OpenAI-compatible model with reasoning & search
+1. **GPT OSS 20B** - OpenAI-compatible with **built-in browser search** & code execution
+2. **GPT OSS 120B** - Flagship OpenAI-compatible model with reasoning & **built-in browser search**
 3. **DeepSeek R1 70B** - Top reasoning model (94.5% MATH-500, beats o1 mini)
 4. **Qwen3 32B** - Alibaba's powerful multilingual model
 5. **Kimi K2** - Moonshot AI's instruction-following model
@@ -211,6 +212,23 @@ npm run typecheck  # Run TypeScript checks
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `GROQ_API_KEY` | Your Groq Cloud API key | Yes |
+
+## Web Search Feature
+
+### Built-in Browser Search (No API Key Required)
+- **Available Models**: GPT OSS 20B and GPT OSS 120B only
+- **How to Enable**: 
+  1. Select GPT OSS 20B or 120B model in settings
+  2. Toggle "Enable Web Search" in settings
+  3. Ask about current events or recent information
+- **Cost**: Free during beta (included with Groq API)
+- **Powered by**: Groq's internal browser search (Exa)
+
+### Example Queries
+- "What are today's AI news?"
+- "今日の技術ニュースを教えて"
+- "Latest developments in quantum computing"
+- "Current stock market situation"
 
 ## Performance
 
