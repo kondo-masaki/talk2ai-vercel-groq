@@ -105,9 +105,37 @@ export async function POST(req: Request) {
           'X-Vercel-AI-UI-Message-Stream': 'v1',
         },
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error with direct Groq API:', error)
-      // Fall back to regular handling without browser_search tool
+      
+      // Check if it's a rate limit error
+      if (error.message?.includes('429') || error.message?.includes('Too Many Requests') || error.message?.includes('rate_limit_exceeded')) {
+        // Return error message to client
+        const encoder = new TextEncoder()
+        const stream = new ReadableStream({
+          start(controller) {
+            const errorMessage = {
+              type: 'error',
+              error: 'Rate limit exceeded. Please try again later or use a different model. The daily token limit has been reached for GPT OSS models.'
+            }
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorMessage)}\n\n`))
+            controller.enqueue(encoder.encode('data: {"type":"finish"}\n\n'))
+            controller.close()
+          }
+        })
+        
+        return new Response(stream, {
+          headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'X-Accel-Buffering': 'no',
+            'X-Vercel-AI-UI-Message-Stream': 'v1',
+          },
+        })
+      }
+      
+      // Fall back to regular handling without browser_search tool for other errors
       const groqOptions: any = {
         model: groq(model),
         messages,

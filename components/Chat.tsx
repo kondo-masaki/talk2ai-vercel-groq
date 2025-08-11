@@ -63,6 +63,7 @@ export default function Chat() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   
   // Settings state
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
@@ -210,6 +211,10 @@ export default function Chat() {
                     if (parsed.result) {
                       assistantMessage += `\n\n[Search results: ${JSON.stringify(parsed.result)}]\n\n`
                     }
+                    break
+                  case 'error':
+                    // Handle error messages
+                    setErrorMessage(parsed.error || 'An error occurred. Please try again.')
                     break
                   default:
                     // Ignore other types (start, finish, etc.)
@@ -442,6 +447,31 @@ export default function Chat() {
         settings={settings}
         onSettingsChange={handleSettingsChange}
       />
+      
+      {/* Error Dialog */}
+      {errorMessage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0 mr-3">
+                <svg className="h-8 w-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Error</h3>
+            </div>
+            <p className="text-gray-700 mb-6">{errorMessage}</p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setErrorMessage(null)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
