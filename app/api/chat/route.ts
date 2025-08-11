@@ -41,10 +41,21 @@ export async function POST(req: Request) {
       })
 
       if (!response.ok) {
+        // Try to get error details from response body
+        let errorMessage = `Groq API error: ${response.statusText}`
+        try {
+          const errorBody = await response.json()
+          if (errorBody.error?.message) {
+            errorMessage = errorBody.error.message
+          }
+        } catch (e) {
+          // If can't parse body, use default message
+        }
+        
         const errorData = {
           status: response.status,
           statusText: response.statusText,
-          message: `Groq API error: ${response.statusText}`
+          message: errorMessage
         }
         throw errorData
       }
@@ -115,13 +126,22 @@ export async function POST(req: Request) {
       
       // Check if it's a rate limit error (429 status code)
       if (error.status === 429 || error.message?.includes('429') || error.message?.includes('Too Many Requests') || error.message?.includes('rate_limit_exceeded')) {
+        // Extract retry time from error message if available
+        let retryTime = ''
+        const errorStr = error.message || error.toString()
+        const retryMatch = errorStr.match(/Please try again in ([^.]+)/)
+        if (retryMatch) {
+          retryTime = retryMatch[1]
+        }
+        
         // Return error message to client
         const encoder = new TextEncoder()
         const stream = new ReadableStream({
           start(controller) {
             const errorMessage = {
               type: 'error',
-              error: 'Rate limit exceeded. Please try again later or use a different model. The daily token limit has been reached for GPT OSS models.'
+              error: `Rate limit exceeded. ${retryTime ? `Please try again in ${retryTime}` : 'Please try again later'} or use a different model. The daily token limit has been reached for GPT OSS models.`,
+              retryTime
             }
             controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorMessage)}\n\n`))
             controller.enqueue(encoder.encode('data: {"type":"finish"}\n\n'))
@@ -186,14 +206,25 @@ export async function POST(req: Request) {
                        error.message?.includes('rate_limit_exceeded') ||
                        error.message?.includes('429')
     
+    // Extract retry time from error message if available
+    let retryTime = ''
+    if (isRateLimit) {
+      const errorStr = error.message || error.toString()
+      const retryMatch = errorStr.match(/Please try again in ([^.]+)/)
+      if (retryMatch) {
+        retryTime = retryMatch[1]
+      }
+    }
+    
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
       start(controller) {
         const errorMessage = {
           type: 'error',
           error: isRateLimit 
-            ? 'Rate limit exceeded. Please try again later or use a different model.'
-            : 'An error occurred while processing your request. Please try again.'
+            ? `Rate limit exceeded. ${retryTime ? `Please try again in ${retryTime}` : 'Please try again later'} or use a different model.`
+            : 'An error occurred while processing your request. Please try again.',
+          retryTime: isRateLimit ? retryTime : undefined
         }
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(errorMessage)}\n\n`))
         controller.enqueue(encoder.encode('data: {"type":"finish"}\n\n'))

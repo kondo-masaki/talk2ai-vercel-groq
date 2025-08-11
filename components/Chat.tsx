@@ -98,12 +98,27 @@ export default function Chat() {
   
   // Save settings to localStorage when changed
   const handleSettingsChange = (newSettings: typeof settings) => {
+    const oldModel = settings.llmModel
     setSettings(newSettings)
+    
+    // Clear chat history if model changed
+    if (oldModel !== newSettings.llmModel) {
+      setMessages([])
+      setErrorMessage(null)
+    }
+    
     try {
       localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(newSettings))
     } catch (error) {
       console.error('Failed to save settings:', error)
     }
+  }
+  
+  // Clear chat history
+  const handleClearChat = () => {
+    setMessages([])
+    setInput('')
+    setErrorMessage(null)
   }
   
   // Reflect speech recognition text to input field
@@ -324,13 +339,22 @@ export default function Chat() {
               Voice: {settings.speechRecognition === 'web-speech-api' ? 'Web Speech' : 'Whisper'}
             </p>
           </div>
-          <button
-            onClick={() => setShowSettings(true)}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
-            title="Settings"
-          >
-            ⚙️
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleClearChat}
+              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              title="Clear chat"
+            >
+              🔄
+            </button>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+              title="Settings"
+            >
+              ⚙️
+            </button>
+          </div>
         </div>
       </div>
       
