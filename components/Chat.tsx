@@ -174,6 +174,11 @@ export default function Chat() {
           const lines = chunk.split('\n').filter(line => line.trim())
           
           for (const line of lines) {
+            // Skip [DONE] marker
+            if (line === 'data: [DONE]' || line === '[DONE]') {
+              continue
+            }
+            
             if (line.startsWith('data: ')) {
               // Server-sent event format
               const data = line.substring(6)

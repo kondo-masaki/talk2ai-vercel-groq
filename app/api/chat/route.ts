@@ -107,7 +107,16 @@ export async function POST(req: Request) {
       })
     } catch (error) {
       console.error('Error with direct Groq API:', error)
-      // Fall back to regular handling
+      // Fall back to regular handling without browser_search tool
+      const groqOptions: any = {
+        model: groq(model),
+        messages,
+        temperature,
+        maxRetries: 3,
+      }
+      
+      const result = streamText(groqOptions)
+      return result.toUIMessageStreamResponse()
     }
   }
   
